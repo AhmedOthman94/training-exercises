@@ -4,8 +4,10 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/AhmedOthman94/training-exercises/internal/app"
+	"github.com/AhmedOthman94/training-exercises/internal/routes"
 )
 
 func main() {
@@ -20,11 +22,16 @@ func main() {
 		panic(err)
 	}
 
-	http.HandleFunc("/health", app.HealthCheck)
+	// Setuo routes
+	r := routes.SetupRoutes(app)
 
 	// Create new server
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", port),
+		Addr:         fmt.Sprintf(":%d", port),
+		Handler:      r,
+		IdleTimeout:  1 * time.Minute,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 30 * time.Second,
 	}
 
 	app.Logger.Printf("We are running out app on port: %d\n", port)
